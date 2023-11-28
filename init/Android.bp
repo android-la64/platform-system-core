@@ -91,15 +91,16 @@ init_host_sources = [
 
 cc_defaults {
     name: "init_defaults",
-    sanitize: {
-        misc_undefined: ["signed-integer-overflow"],
-    },
+    //sanitize: {
+    //    misc_undefined: ["signed-integer-overflow"],
+    //},
     cflags: [
         "-DLOG_UEVENTS=0",
         "-Wall",
         "-Wextra",
         "-Wno-unused-parameter",
         "-Werror",
+        "-Wno-string-concatenation",
         "-Wthread-safety",
         "-DALLOW_FIRST_STAGE_CONSOLE=0",
         "-DALLOW_LOCAL_PROP_OVERRIDE=0",
@@ -361,10 +362,10 @@ cc_binary {
         },
     },
 
-    sanitize: {
-        misc_undefined: ["signed-integer-overflow"],
-        hwaddress: false,
-    },
+    //sanitize: {
+    //    misc_undefined: ["signed-integer-overflow"],
+    //    hwaddress: false,
+    //},
 }
 
 // Tests

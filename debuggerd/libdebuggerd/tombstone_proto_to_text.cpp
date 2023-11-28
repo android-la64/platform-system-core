@@ -47,6 +47,8 @@ static const char* abi_string(const Tombstone& tombstone) {
       return "arm";
     case Architecture::ARM64:
       return "arm64";
+    case Architecture::LOONGARCH64:
+      return "loongarch64";
     case Architecture::X86:
       return "x86";
     case Architecture::X86_64:
@@ -61,6 +63,8 @@ static int pointer_width(const Tombstone& tombstone) {
     case Architecture::ARM32:
       return 4;
     case Architecture::ARM64:
+      return 8;
+    case Architecture::LOONGARCH64:
       return 8;
     case Architecture::X86:
       return 4;
@@ -112,6 +116,10 @@ static void print_thread_registers(CallbackType callback, const Tombstone& tombs
 
     case Architecture::ARM64:
       special_registers = {"ip", "lr", "sp", "pc", "pst"};
+      break;
+
+    case Architecture::LOONGARCH64:
+      special_registers = {"ra", "sp", "pc"};
       break;
 
     case Architecture::X86:
@@ -226,6 +234,43 @@ static void print_thread_memory_dump(CallbackType callback, const Tombstone& tom
 
       CBS("%s  %s", line.c_str(), ascii);
     }
+  }
+
+  for (const auto& mem : thread.memory_dump()) {
+      for (const auto &mem_sp : mem.memory_from_sp()) {
+        uint64_t addr = mem_sp.begin_address();
+        uint64_t tagged_addr = addr;
+
+        CBS("\nmemory near 0x%016lx:", addr);
+
+        for (size_t offset = 0; offset < mem_sp.memory().size(); offset += bytes_per_line) {
+          std::string line = StringPrintf("    %0*" PRIx64, word_size * 2, tagged_addr + offset);
+
+          size_t bytes = std::min(bytes_per_line, mem_sp.memory().size() - offset);
+          for (size_t i = 0; i < bytes; i += word_size) {
+            uint64_t word = 0;
+
+            // Assumes little-endian, but what doesn't?
+            memcpy(&word, mem_sp.memory().data() + offset + i, word_size);
+
+            StringAppendF(&line, " %0*" PRIx64, word_size * 2, word);
+          }
+
+          char ascii[bytes_per_line + 1];
+
+          memset(ascii, '.', sizeof(ascii));
+          ascii[bytes_per_line] = '\0';
+
+          for (size_t i = 0; i < bytes; ++i) {
+            uint8_t byte = mem_sp.memory()[offset + i];
+            if (byte >= 0x20 && byte < 0x7f) {
+              ascii[i] = byte;
+            }
+          }
+
+          CBS("%s  %s", line.c_str(), ascii);
+	}
+      }
   }
 }
 

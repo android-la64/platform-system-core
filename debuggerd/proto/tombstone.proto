@@ -39,8 +39,9 @@ enum Architecture {
   ARM64 = 1;
   X86 = 2;
   X86_64 = 3;
+  LOONGARCH64 = 4;
 
-  reserved 4 to 999;
+  reserved 5 to 999;
 }
 
 message Signal {
@@ -151,16 +152,24 @@ message ArmMTEMetadata {
   reserved 2 to 999;
 }
 
+message MemoryDumpFromSP {
+  uint64 begin_address = 1;
+  string mapping_name = 2;
+  bytes memory = 3;
+  reserved 4 to 999;
+}
+
 message MemoryDump {
   string register_name = 1;
   string mapping_name = 2;
   uint64 begin_address = 3;
   bytes memory = 4;
+  repeated MemoryDumpFromSP memory_from_sp = 5;
   oneof metadata {
     ArmMTEMetadata arm_mte_metadata = 6;
   }
 
-  reserved 5, 7 to 999;
+  reserved 7 to 999;
 }
 
 message MemoryMapping {

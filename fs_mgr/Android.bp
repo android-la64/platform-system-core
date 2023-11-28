@@ -213,7 +213,9 @@ cc_binary {
         "libfs_mgr_binder",
         "liblog",
         "liblp",
+        "libprocessgroup",
         "libselinux",
+        "libvndksupport",
     ],
     header_libs: [
         "libcutils_headers",

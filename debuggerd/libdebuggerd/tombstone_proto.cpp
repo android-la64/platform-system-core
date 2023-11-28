@@ -75,6 +75,8 @@ static Architecture get_arch() {
   return Architecture::X86;
 #elif defined(__x86_64__)
   return Architecture::X86_64;
+#elif defined(__loongarch__) && (__loongarch_grlen == 64)
+  return Architecture::LOONGARCH64;
 #else
 #error Unknown architecture!
 #endif
@@ -335,6 +337,39 @@ void fill_in_backtrace_frame(BacktraceFrame* f, const unwindstack::FrameData& fr
   }
 }
 
+static void dump_memory_from_sp (MemoryDump &dump, unwindstack::Maps* maps,
+                        unwindstack::Memory *memory,
+                        char *data_in_sp, size_t size) {
+  for (size_t offset = 0; offset < size; offset += sizeof(void *)) {
+    uint64_t address;
+    MemoryDumpFromSP memory_sp;
+    // Make address, Assumes little-endian, but what doesn't?
+    memcpy(&address, data_in_sp + offset, sizeof(address));
+    unwindstack::MapInfo* map_info = maps->Find(untag_address(address));
+    if (map_info) {
+      memory_sp.set_mapping_name(map_info->name());
+    }
+    constexpr size_t kNumBytesAroundRegister = 256;
+    constexpr size_t kNumTagsAroundRegister = kNumBytesAroundRegister / kTagGranuleSize;
+    char buf[kNumBytesAroundRegister];
+    uint8_t tags[kNumTagsAroundRegister];
+    size_t start_offset = 0;
+    ssize_t bytes = dump_memory(buf, sizeof(buf), tags, sizeof(tags), &address, memory);
+    if (bytes == -1) {
+      continue;
+    }
+    memory_sp.set_begin_address(address);
+
+    if (start_offset + bytes > sizeof(buf)) {
+      async_safe_fatal("dump_memory overflowed? start offset = %zu, bytes read = %zd",
+                       start_offset, bytes);
+    }
+
+    memory_sp.set_memory(buf, bytes);
+    *dump.add_memory_from_sp() = std::move(memory_sp);
+  }
+}
+
 static void dump_thread(Tombstone* tombstone, unwindstack::Unwinder* unwinder,
                         const ThreadInfo& thread_info, bool memory_dump = false) {
   Thread thread;
@@ -392,6 +427,10 @@ static void dump_thread(Tombstone* tombstone, unwindstack::Unwinder* unwinder,
           if (has_tags) {
             dump.mutable_arm_mte_metadata()->set_memory_tags(tags, kNumTagsAroundRegister);
           }
+
+	  if (strcmp(name, "sp") == 0) {
+            dump_memory_from_sp (dump, maps, memory, buf, bytes);
+	  }
 
           *thread.add_memory_dump() = std::move(dump);
         }

@@ -109,6 +109,11 @@ Result<void> SetMmapRndBitsAction(const BuiltinArguments&) {
     if (SetMmapRndBitsMin(33, 24, false) && SetMmapRndBitsMin(16, 16, true)) {
         return {};
     }
+#elif defined(__loongarch__) && (__loongarch_grlen == 64)
+    // TODO: RISC-V Update rnd bits when memory model change
+    if (SetMmapRndBitsMin(24, 18, false)) {
+        return {};
+    }
 #elif defined(__x86_64__)
     // x86_64 supports 28 - 32 bits
     if (SetMmapRndBitsMin(32, 32, false) && SetMmapRndBitsMin(16, 16, true)) {
