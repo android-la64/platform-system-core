@@ -351,7 +351,8 @@ int FirstStageMain(int argc, char** argv) {
     }
 
     if (!DoFirstStageMount(!created_devices)) {
-        LOG(FATAL) << "Failed to mount required partitions early ...";
+        // XC-TODO workaround: ignore DoFirstStageMount error
+        LOG(ERROR) << "Failed to mount required partitions early ...";
     }
 
     struct stat new_root_info;
