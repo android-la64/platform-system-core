@@ -493,7 +493,7 @@ on late-init
     trigger load_bpf_programs
 
     # Now we can start zygote for devices with file based encryption
-    trigger zygote-start
+#    trigger zygote-start
 
     # Remove a file to wake up anything waiting for firmware.
     trigger firmware_mounts_complete
@@ -951,8 +951,8 @@ on zygote-start && property:ro.crypto.state=unencrypted
     exec_start update_verifier_nonencrypted
     start statsd
     start netd
-    start zygote
-    start zygote_secondary
+#    start zygote
+#    start zygote_secondary
 
 on zygote-start && property:ro.crypto.state=unsupported
     wait_for_prop odsign.verification.done 1
@@ -960,8 +960,8 @@ on zygote-start && property:ro.crypto.state=unsupported
     exec_start update_verifier_nonencrypted
     start statsd
     start netd
-    start zygote
-    start zygote_secondary
+#    start zygote
+#    start zygote_secondary
 
 on zygote-start && property:ro.crypto.state=encrypted && property:ro.crypto.type=file
     wait_for_prop odsign.verification.done 1
@@ -1100,7 +1100,7 @@ on property:vold.decrypt=trigger_load_persist_props
 
 on property:vold.decrypt=trigger_post_fs_data
     trigger post-fs-data
-    trigger zygote-start
+#    trigger zygote-start
 
 on property:vold.decrypt=trigger_restart_min_framework
     # A/B update verifier that marks a successful boot.
@@ -1245,7 +1245,7 @@ on userspace-reboot-fs-remount
 on userspace-reboot-resume
   trigger userspace-reboot-fs-remount
   trigger post-fs-data
-  trigger zygote-start
+#  trigger zygote-start
   trigger early-boot
   trigger boot
 
