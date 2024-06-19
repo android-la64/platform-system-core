@@ -119,7 +119,7 @@ static void print_thread_registers(CallbackType callback, const Tombstone& tombs
       break;
 
     case Architecture::LOONGARCH64:
-      special_registers = {"ra", "sp", "pc"};
+      special_registers = {"pc"};
       break;
 
     case Architecture::X86:

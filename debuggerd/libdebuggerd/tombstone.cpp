@@ -337,7 +337,7 @@ void dump_registers(log_t* log, unwindstack::Regs* regs) {
 #elif defined(__x86_64__)
   static constexpr const char* special_registers[] = {"rbp", "rsp", "rip"};
 #elif defined(__loongarch__)
-  static constexpr const char* special_registers[] = {"ra", "sp", "pc"};
+  static constexpr const char* special_registers[] = {"pc"};
 #else
   static constexpr const char* special_registers[] = {};
 #endif
