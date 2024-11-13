@@ -451,6 +451,17 @@ static bool GetGuestRegistersFromCrashedProcess([[maybe_unused]] pid_t tid,
     PLOG(ERROR) << "failed to read thread register for thread " << tid;
     return false;
   }
+#elif defined(__loongarch64)
+  /* TODO, loongarch define ELF_NGREG as 45, but kernel 6.6 writes only 35 registers out
+   * for GETREGSET?
+   */
+  unsigned long data[45];
+  struct iovec pt_iov = {.iov_base = &data, .iov_len = sizeof(data)};
+  if (ptrace(PTRACE_GETREGSET, tid, NT_PRSTATUS, &pt_iov) != 0) {
+    PLOG(ERROR) << "failed to read thread register for thread " << tid;
+    return false;
+  }
+  base = reinterpret_cast<uintptr_t>(&data[2]); //tp is $2
 #elif defined(__riscv)
   struct user_regs_struct regs;
   struct iovec pt_iov = {.iov_base = &regs, .iov_len = sizeof(regs)};

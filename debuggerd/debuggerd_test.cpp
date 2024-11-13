@@ -413,6 +413,8 @@ TEST_F(CrasherTest, heap_addr_in_register) {
   ASSERT_MATCH(result, "memory near x0 \\(\\[anon:");
 #elif defined(__arm__)
   ASSERT_MATCH(result, "memory near r0 \\(\\[anon:");
+#elif defined(__loongarch64)
+  ASSERT_MATCH(result, "memory near a0 \\(\\[anon:");
 #elif defined(__riscv)
   ASSERT_MATCH(result, "memory near a0 \\(\\[anon:");
 #elif defined(__x86_64__)
@@ -2874,6 +2876,13 @@ TEST_F(CrasherTest, verify_dex_pc_with_function_name) {
         : [base] "+r"(ptr)
         :
         : "x1", "x2", "memory");
+#elif defined(__loongarch64)
+    asm volatile(
+        "mov ra, %[base]\n"
+        "st.d zero, zero, 0\n"
+        : [base] "+r"(ptr)
+        :
+        : "ra", "memory");
 #elif defined(__riscv)
     // TODO: x1 is ra (the link register) on riscv64, so this might have
     // unintended consequences, but we'll need to change the .cfi_escape if so.

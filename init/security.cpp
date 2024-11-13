@@ -113,6 +113,11 @@ Result<void> SetMmapRndBitsAction(const BuiltinArguments&) {
     if (SetMmapRndBitsMin(33, 24, false) && (!Has32BitAbi() || SetMmapRndBitsMin(16, 16, true))) {
         return {};
     }
+#elif defined(__loongarch64)
+    /* upstream kernel default to 12-18, should be changed */
+    if (SetMmapRndBitsMin(33, 24, false)) {
+        return {};
+    }
 #elif defined(__riscv)
     // riscv64 supports 24 rnd bits with Sv39, and starting with the 6.9 kernel,
     // 33 bits with Sv48 and Sv57.

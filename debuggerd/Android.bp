@@ -558,6 +558,9 @@ prebuilt_etc {
                 "crash_dump.policy_other",
             ],
         },
+        loongarch64: {
+            src: "seccomp_policy/crash_dump.loongarch64.policy",
+        },
         riscv64: {
             src: "seccomp_policy/crash_dump.riscv64.policy",
         },
@@ -587,6 +590,9 @@ prebuilt_etc {
         },
         arm64: {
             src: "seccomp_policy/crash_dump.arm.policy",
+        },
+        loongarch64: {
+            enabled: false,
         },
         riscv64: {
             enabled: false,

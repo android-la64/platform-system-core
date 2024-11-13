@@ -85,6 +85,8 @@ static const char* abi_string(const Architecture& arch) {
       return "arm";
     case Architecture::ARM64:
       return "arm64";
+    case Architecture::LOONGARCH64:
+      return "loongarch64";
     case Architecture::RISCV64:
       return "riscv64";
     case Architecture::X86:

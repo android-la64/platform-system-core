@@ -335,6 +335,9 @@ noinline int do_action(const char* arg) {
       __asm__ volatile(".word 0xe7f0def0\n");
 #elif defined(__i386__) || defined(__x86_64__)
       __asm__ volatile("ud2\n");
+#elif defined(__loongarch__)
+      // TODO
+      __asm__ volatile("break 0\n");
 #elif defined(__riscv)
       __asm__ volatile("unimp\n");
 #else
