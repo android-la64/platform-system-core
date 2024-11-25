@@ -592,7 +592,7 @@ prebuilt_etc {
             src: "seccomp_policy/crash_dump.arm.policy",
         },
         loongarch64: {
-            enabled: false,
+            src: "seccomp_policy/crash_dump.loongarch.policy",
         },
         riscv64: {
             enabled: false,
